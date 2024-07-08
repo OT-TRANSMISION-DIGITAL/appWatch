@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">App_watch</string>
+    <string name="login_title">Login</string>
+    <string name="username">Usuario</string>
+    <string name="password">Contraseña</string>
+    <string name="login">Login</string>
+    <string name="hello_world">From the Square world,\nHello, %1$s!</string>
+    <string name="title_activity_menu">MenuActivity</string>
+</resources>
