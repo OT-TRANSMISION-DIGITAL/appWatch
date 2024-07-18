@@ -97,7 +97,7 @@ fun WearApp() {
         ) {
             NavHost(navController = navController, startDestination = "login") {
                 composable("login") { LoginScreen(navController) }
-                composable("home") { HomeScreen() }
+                composable("home") { HomeScreen(navController) }
             }
         }
     }
