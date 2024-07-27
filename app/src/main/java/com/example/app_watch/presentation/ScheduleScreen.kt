@@ -1,12 +1,5 @@
-/* While this template provides a good starting point for using Wear Compose, you can always
- * take a look at https://github.com/android/wear-os-samples/tree/main/ComposeStarter and
- * https://github.com/android/wear-os-samples/tree/main/ComposeAdvanced to find the most up to date
- * changes to the libraries and their usages.
- */
-
 package com.example.app_watch.presentation
 
-import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -32,6 +25,8 @@ import com.example.app_watch.R
 import com.example.app_watch.presentation.theme.App_watchTheme
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
@@ -58,6 +53,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.compose.ui.platform.LocalContext
+import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -72,63 +68,31 @@ import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 
-class MainActivity : ComponentActivity() {
-    override fun onCreate(savedInstanceState: Bundle?) {
-        installSplashScreen()
-
-        super.onCreate(savedInstanceState)
-
-        setTheme(android.R.style.Theme_DeviceDefault)
-
-        setContent {
-            WearApp()
+@Composable
+fun scheduleScreen(solicitudes: List<AgendaItem>) {
+    LazyColumn {
+        items(solicitudes) { solicitud ->
+            SolicitudView(solicitud = solicitud)
         }
     }
 }
-
+@Composable
+fun TecnicoView(tecnico: Tecnico) {
+    Column(modifier = Modifier.padding(8.dp)) {
+        Text(text = "Nombre: ${tecnico.nombre}", style = MaterialTheme.typography.body1)
+        Text(text = "ID: ${tecnico.id}", style = MaterialTheme.typography.body2)
+    }
+}
 
 @Composable
-fun WearApp() {
-    val navController = rememberNavController()
-    val solicitudes = listOf(
-        AgendaItem(
-            id = 1,
-            fechaHoraSolicitud = "2024-07-27 13:55:55",
-            estatus = "Autorizar",
-            tecnico_id = 1,
-            tecnico = Tecnico(
-                id = 1,
-                nombre = "Admin",
-                correo = "kennethreyesrubio45@gmail.com",
-                telefono = "8790123456",
-                estatus = 1,
-                codigo = "$2y$10$7r1FzLBx4Q7SZk0eThHGO.vAKOACc6WIF/S9i/TgomAjmX8iiIr6O",
-                watch_codigo = "sdsdfsdf",
-                img = "asdasdadasd",
-                rol_id = 1,
-                created_at = "2024-07-08T03:47:06.000000Z",
-                updated_at = "2024-07-15T19:53:42.000000Z"
-            )
+fun SolicitudView(solicitud: AgendaItem) {
+    Column(modifier = Modifier.padding(16.dp)) {
+        Text(
+            text = "Fecha y Hora: ${solicitud.fechaHoraSolicitud}",
+            style = MaterialTheme.typography.body1
         )
-    )
-    App_watchTheme {
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(Color.White),
-            contentAlignment = Alignment.Center
-        ) {
-            NavHost(navController = navController, startDestination = "login") {
-                composable("login") { LoginScreen(navController) }
-                composable("home") { HomeScreen(navController) }
-                composable("schedule") { scheduleScreen(solicitudes = solicitudes)}
-            }
-        }
+        Text(text = "Estatus: ${solicitud.estatus}", style = MaterialTheme.typography.body1)
+        Spacer(modifier = Modifier.height(8.dp))
+        TecnicoView(tecnico = solicitud.tecnico)
     }
-}
-
-@Preview(device = Devices.WEAR_OS_SMALL_ROUND, showSystemUi = true)
-@Composable
-fun DefaultPreview() {
-    WearApp()
 }

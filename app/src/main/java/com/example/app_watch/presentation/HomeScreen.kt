@@ -82,6 +82,11 @@ fun HomeScreen(navController: NavController) {
         )
         Spacer(modifier = Modifier.height(16.dp)
         )
+        Button(onClick = { navController.navigate("schedule") }) {
+        Text(text = "Agenda",
+        color = Color.Black)
+        }
+        Spacer(modifier = Modifier.height((16.dp)))
         Button(onClick = { cerrar(navController) },
         //    modifier = Modifier.width(200)//
             ) {
