@@ -2,6 +2,7 @@ package com.example.app_watch.presentation
 
 
 import com.example.app_watch.Singleton
+import com.example.app_watch.presentation.Models.Agenda
 import retrofit2.http.*
 import com.example.app_watch.presentation.Models.ApiResponse
 import com.example.app_watch.presentation.Models.LogOut
@@ -15,4 +16,6 @@ interface ApiService {
     @GET("logout")
     fun cerrarSesion(@Header("Authorization") token:String= "Bearer ${Singleton.token}"): Call<LogOut>
 
+    @GET("Agenda")
+    fun agenda(): Call<Agenda>
 }
