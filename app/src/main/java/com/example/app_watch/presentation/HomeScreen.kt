@@ -52,6 +52,7 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.snapshots.SnapshotApplyResult
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -72,26 +73,44 @@ fun HomeScreen(navController: NavController) {
     Column(
         modifier = Modifier
             .fillMaxSize()
+            .background(Color(0xFF0E0E4F))
             .padding(8.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
+        Image(
+            painter = painterResource(id = R.drawable.logolb),
+            contentDescription = stringResource(id = R.string.app_name),
+            modifier = Modifier
+                .size(50.dp)
+                .padding(bottom = 16.dp)
+        )
+        Spacer(modifier = Modifier.height(16.dp))
         Text(
-            "bienvenido ${Singleton.user?.nombre}",
-            color = Color.Black
+            "Bienvenido ${Singleton.user?.nombre}",
+            color = Color(0xFFB3CDE0)
         )
         Spacer(modifier = Modifier.height(16.dp)
         )
-        Button(onClick = { navController.navigate("schedule") }) {
+        Button(onClick = { navController.navigate("schedule") }, colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFF6E6E95))) {
         Text(text = "Agenda",
-        color = Color.Black)
+            color = Color(0xFF0E0E4F),
+            modifier = Modifier.fillMaxWidth(),
+            textAlign = TextAlign.Center,
+            fontSize = 14.sp,
+            maxLines = 1
+            )
         }
         Spacer(modifier = Modifier.height((16.dp)))
         Button(onClick = { cerrar(navController) },
         //    modifier = Modifier.width(200)//
             ) {
         Text(text = "LogOut",
-        color = Color.Black
+            color = Color.Black,
+            modifier = Modifier.fillMaxWidth(),
+            textAlign = TextAlign.Center,
+            fontSize = 14.sp,
+            maxLines = 1
         )
         }
     }
