@@ -4,6 +4,7 @@
     <string name="username">Usuario</string>
     <string name="password">Contraseña</string>
     <string name="login">Login</string>
+    <string name="volver">Volver</string>
     <string name="hello_world">From the Square world,\nHello, %1$s!</string>
     <string name="title_activity_menu">MenuActivity</string>
 </resources>

@@ -69,7 +69,6 @@ import retrofit2.Response
 
 @Composable
 fun HomeScreen(navController: NavController) {
-    println("estoy en home")
     Column(
         modifier = Modifier
             .fillMaxSize()

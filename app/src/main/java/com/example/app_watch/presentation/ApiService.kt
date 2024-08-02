@@ -16,6 +16,6 @@ interface ApiService {
     @GET("logout")
     fun cerrarSesion(@Header("Authorization") token:String= "Bearer ${Singleton.token}"): Call<LogOut>
 
-    @GET("Agenda")
+    @GET("agenda")
     fun agenda(): Call<Agenda>
 }

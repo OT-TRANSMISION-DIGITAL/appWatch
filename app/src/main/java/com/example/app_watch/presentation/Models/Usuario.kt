@@ -4,7 +4,7 @@ data class Usuario(
     val codigo: String,
     val correo: String,
     val created_at: String,
-    val estatus: Boolean,
+    val estatus: Int,
     val id: Int,
     val img: Any,
     val nombre: String,
