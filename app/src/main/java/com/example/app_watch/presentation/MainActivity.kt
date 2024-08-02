@@ -90,27 +90,6 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun WearApp() {
     val navController = rememberNavController()
-    val solicitudes = listOf(
-        AgendaItem(
-            id = 1,
-            fechaHoraSolicitud = "2024-07-27 13:55:55",
-            estatus = "Autorizar",
-            tecnico_id = 1,
-            tecnico = Tecnico(
-                id = 1,
-                nombre = "Admin",
-                correo = "kennethreyesrubio45@gmail.com",
-                telefono = "8790123456",
-                estatus = 1,
-                codigo = "$2y$10$7r1FzLBx4Q7SZk0eThHGO.vAKOACc6WIF/S9i/TgomAjmX8iiIr6O",
-                watch_codigo = "sdsdfsdf",
-                img = "asdasdadasd",
-                rol_id = 1,
-                created_at = "2024-07-08T03:47:06.000000Z",
-                updated_at = "2024-07-15T19:53:42.000000Z"
-            )
-        )
-    )
     App_watchTheme {
         Box(
             modifier = Modifier
@@ -121,7 +100,7 @@ fun WearApp() {
             NavHost(navController = navController, startDestination = "login") {
                 composable("login") { LoginScreen(navController) }
                 composable("home") { HomeScreen(navController) }
-                composable("schedule") { scheduleScreen(solicitudes = solicitudes)}
+                composable("schedule") { scheduleScreen(navController)}
             }
         }
     }

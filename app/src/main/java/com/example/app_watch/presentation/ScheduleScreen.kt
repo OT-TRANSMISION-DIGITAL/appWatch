@@ -1,6 +1,7 @@
 package com.example.app_watch.presentation
 
 import android.os.Bundle
+import android.widget.Space
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
@@ -30,6 +31,8 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
+import androidx.compose.material3.Divider
+import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.TextFieldDefaults
@@ -58,6 +61,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.app_watch.Singleton
+import com.example.app_watch.presentation.Models.Agenda
 import com.example.app_watch.presentation.Models.AgendaItem
 import com.example.app_watch.presentation.Models.ApiResponse
 import com.example.app_watch.presentation.Models.Tecnico
@@ -68,19 +72,98 @@ import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 
-@Composable
-fun scheduleScreen(solicitudes: List<AgendaItem>) {
-    LazyColumn {
-        items(solicitudes) { solicitud ->
-            SolicitudView(solicitud = solicitud)
+
+class AgendaViewModel : ViewModel() {
+    private val _agendaList = mutableStateListOf<AgendaItem>()
+    val agendaList: List<AgendaItem> by derivedStateOf { _agendaList }
+
+    init {
+        fetchAgendaData()
+    }
+
+    private fun fetchAgendaData() {
+        viewModelScope.launch {
+            val call = RetrofitClient.api.agenda()
+            call.enqueue(object : Callback<Agenda> {
+                override fun onResponse(call: Call<Agenda>, response: Response<Agenda>) {
+                    if (response.isSuccessful) {
+                        val agenda = response.body()
+                        _agendaList.clear()
+                        if (agenda != null) {
+                            _agendaList.addAll(agenda)
+                        }
+                    } else {
+                        println("Error en la respuesta: ${response.code()}")
+                    }
+                }
+
+                override fun onFailure(call: Call<Agenda>, t: Throwable) {
+                    println("Error en la solicitud: ${t.message}")
+                }
+            })
         }
     }
 }
+
+@Composable
+fun scheduleScreen(navController: NavController,agendaViewModel: AgendaViewModel = viewModel()) {
+
+    val agendaList = remember { agendaViewModel.agendaList }
+
+    Column (
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(8.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center)
+    {
+        Row (
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(8.dp),
+            horizontalArrangement = Arrangement.Start
+        ) {
+            Button(onClick = { navController.navigate("home") }, modifier = Modifier.size(40.dp)) {
+                Icon(
+                    painter = painterResource(id = R.drawable.volver),
+                    contentDescription = "Icon",
+                    modifier = Modifier.size(24.dp)
+                )
+            }
+            Spacer(modifier = Modifier.padding(horizontal = 10.dp))
+            Text(
+                "Agenda",
+                color = Color(0xFF4B4EA3)
+            )
+        }
+        Divider(
+            color = Color(0xFF4B4EA3),
+            thickness = 1.dp,
+            modifier = Modifier.padding(vertical = 4.dp)
+        )
+        Spacer(modifier = Modifier.height(16.dp))
+
+        LazyColumn {
+            items(agendaList) { solicitud ->
+                println(solicitud)
+                Column {
+                    SolicitudView(solicitud = solicitud)
+                    Divider(
+                        color = Color(0xFF4B4EA3),
+                        thickness = 1.dp,
+                        modifier = Modifier.padding(vertical = 4.dp)
+                    )
+                }
+            }
+        }
+    }
+}
+
 @Composable
 fun TecnicoView(tecnico: Tecnico) {
     Column(modifier = Modifier.padding(8.dp)) {
-        Text(text = "Nombre: ${tecnico.nombre}", style = MaterialTheme.typography.body1)
-        Text(text = "ID: ${tecnico.id}", style = MaterialTheme.typography.body2)
+        Text(text = "Nombre: ${tecnico.nombre}", color = Color.Black)
+        Text(text = "ID: ${tecnico.id}", color = Color.Black)
     }
 }
 
@@ -89,9 +172,9 @@ fun SolicitudView(solicitud: AgendaItem) {
     Column(modifier = Modifier.padding(16.dp)) {
         Text(
             text = "Fecha y Hora: ${solicitud.fechaHoraSolicitud}",
-            style = MaterialTheme.typography.body1
+            color = Color.Black
         )
-        Text(text = "Estatus: ${solicitud.estatus}", style = MaterialTheme.typography.body1)
+        Text(text = "Estatus: ${solicitud.estatus}", color = Color.Black)
         Spacer(modifier = Modifier.height(8.dp))
         TecnicoView(tecnico = solicitud.tecnico)
     }
