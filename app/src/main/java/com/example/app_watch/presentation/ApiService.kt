@@ -6,6 +6,8 @@ import com.example.app_watch.presentation.Models.Agenda
 import retrofit2.http.*
 import com.example.app_watch.presentation.Models.ApiResponse
 import com.example.app_watch.presentation.Models.LogOut
+import com.example.app_watch.presentation.Models.ordenDetail
+import com.example.app_watch.presentation.Models.visitDetail
 import okhttp3.RequestBody
 import retrofit2.Call
 
@@ -17,5 +19,11 @@ interface ApiService {
     fun cerrarSesion(@Header("Authorization") token:String= "Bearer ${Singleton.token}"): Call<LogOut>
 
     @GET("agenda")
-    fun agenda(): Call<Agenda>
+    fun agenda(@Query("tipo") tipo: String?,@Query("fecha") fecha: String?): Call<Agenda>
+
+    @GET("ordenes/{id}")
+    fun ordenDetail(@Path("id") id: String): Call<ordenDetail>
+
+    @GET("visitas/{id}")
+    fun visitaDetail(@Path("id") id: String): Call<visitDetail>
 }

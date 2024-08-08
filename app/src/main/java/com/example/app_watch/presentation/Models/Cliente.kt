@@ -1,15 +1,11 @@
 package com.example.app_watch.presentation.Models
 
-data class Tecnico(
-    val codigo: String,
+data class Cliente(
     val correo: String,
-    val created_at: String,
+    val created_at: Any,
     val estatus: Boolean,
     val id: Int,
-    val img: Any,
     val nombre: String,
-    val rol_id: Int,
     val telefono: String,
-    val updated_at: String,
-    val watch_codigo: String
+    val updated_at: Any
 )
