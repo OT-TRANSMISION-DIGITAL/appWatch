@@ -167,7 +167,9 @@ fun validateCodigo(codigo: String, callback: (Boolean) -> Unit) {
             if (response.isSuccessful) {
                 val apiResponse = response.body()
                 Singleton.token = apiResponse?.token ?: ""
-                Singleton.user = apiResponse?.usuario
+                Singleton.rol = apiResponse?.usuario?.rol_id ?: 0
+                Singleton.user_id = apiResponse?.usuario?.id ?: 0
+                Singleton.name = apiResponse?.usuario?.nombre ?: ""
                 callback(true)
             } else {
                 println("Error: ${response.errorBody()}")

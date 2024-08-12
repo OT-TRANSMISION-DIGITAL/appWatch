@@ -44,7 +44,7 @@ fun HomeScreen(navController: NavController) {
         )
         Spacer(modifier = Modifier.height(16.dp))
         Text(
-            "Bienvenido ${Singleton.user?.nombre}",
+            "Bienvenido ${Singleton.name}",
             color = Color(0xFF5D4CC0)
         )
         Spacer(modifier = Modifier.height(6.dp)
@@ -70,7 +70,7 @@ fun HomeScreen(navController: NavController) {
             }
 
             Button(
-                onClick = { cerrar(navController) },
+                onClick = { navController.navigate("login") },
                 modifier = Modifier
                     .weight(1f)
                     .padding(start = 8.dp)
@@ -84,23 +84,4 @@ fun HomeScreen(navController: NavController) {
 
 
     }
-}
-fun cerrar (navController: NavController) {
-    val call = RetrofitClient.api.cerrarSesion()
-    print(call)
-    call.enqueue(object:Callback<LogOut>{
-        override fun onResponse(call: Call<LogOut>, response: Response<LogOut>) {
-            if(response.isSuccessful){
-                print(response.body())
-                navController.navigate("login")
-            }
-            else{
-                print(response.body())
-            }
-        }
-        override fun onFailure(call: Call<LogOut>, t: Throwable) {
-
-        }
-
-    })
 }
