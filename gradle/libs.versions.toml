@@ -45,6 +45,7 @@ appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "a
 material = { group = "com.google.android.material", name = "material", version.ref = "material" }
 activity = { group = "androidx.activity", name = "activity", version.ref = "activity" }
 navigation-compose = { group = "androidx.navigation", name = "navigation-compose", version.ref = "navigationCompose" }
+pusher-java-client = { group = "com.pusher", name = "pusher-java-client", version = "2.4.2" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

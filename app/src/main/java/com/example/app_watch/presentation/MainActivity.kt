@@ -6,6 +6,11 @@
 
 package com.example.app_watch.presentation
 
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.content.Context
+import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -20,9 +25,11 @@ import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.app_watch.presentation.theme.App_watchTheme
 import androidx.compose.ui.graphics.Color
+import androidx.core.content.ContextCompat
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.example.app_watch.Singleton
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -32,11 +39,50 @@ class MainActivity : ComponentActivity() {
 
         setTheme(android.R.style.Theme_DeviceDefault)
 
+        loadData(this)
+
+        Intent(this, PusherService::class.java).also { intent ->
+            ContextCompat.startForegroundService(this, intent)
+        }
+
+
         setContent {
             WearApp()
         }
     }
+
+    override fun onPause() {
+        super.onPause()
+        saveData(this)
+    }
+
 }
+
+fun saveData(context: Context) {
+    val sharedPreferences = context.getSharedPreferences("MyAppPrefs", Context.MODE_PRIVATE)
+    val editor = sharedPreferences.edit()
+
+    // Guardar el token
+    editor.putString("token", Singleton.token)
+    editor.putInt("rol", Singleton.rol)
+    editor.putInt("user_id", Singleton.user_id)
+    editor.putString("name", Singleton.name)
+
+    editor.apply()
+}
+
+fun loadData(context: Context) {
+    val sharedPreferences = context.getSharedPreferences("MyAppPrefs", Context.MODE_PRIVATE)
+
+    // Recuperar los datos del Singleton
+    Singleton.token = sharedPreferences.getString("token", "") ?: ""
+    Singleton.rol = sharedPreferences.getInt("rol", -1)
+    Singleton.user_id = sharedPreferences.getInt("user_id", -1)
+    Singleton.name = sharedPreferences.getString("name", "") ?: ""
+}
+
+
+
 
 
 @Composable
