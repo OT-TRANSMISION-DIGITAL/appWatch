@@ -107,7 +107,7 @@ fun visitScreen(navController: NavController, id: String){
                 .padding(8.dp),
             horizontalArrangement = Arrangement.Start
         ) {
-            Button(onClick = { navController.navigate("ordenes") }, modifier = Modifier.size(40.dp)) {
+            Button(onClick = { navController.navigate("visitas") }, modifier = Modifier.size(40.dp)) {
                 Icon(
                     painter = painterResource(id = R.drawable.volver),
                     contentDescription = "Icon",
