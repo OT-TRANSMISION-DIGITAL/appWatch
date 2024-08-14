@@ -42,8 +42,7 @@ import java.time.format.DateTimeFormatter
 
 
 class visitDetailViewHolder(val orderId: String) : ViewModel() {
-    private val _detailList = mutableStateListOf<visitDetail>()
-    val detailList: List<visitDetail> by derivedStateOf { _detailList }
+    val detailList = mutableStateListOf<visitDetail>()
 
     init {
         getVisitDetail()
@@ -57,9 +56,9 @@ class visitDetailViewHolder(val orderId: String) : ViewModel() {
                 override fun onResponse(call: Call<visitDetail>, response: Response<visitDetail>) {
                     if (response.isSuccessful) {
                         val detail = response.body()
-                        _detailList.clear()
+                        detailList.clear()
                         if (detail != null) {
-                            _detailList.addAll(listOf(detail))
+                            detailList.addAll(listOf(detail))
                         }
                     } else {
                         println("Error en la respuesta: ${response.code()}")

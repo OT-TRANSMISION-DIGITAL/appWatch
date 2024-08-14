@@ -13,6 +13,7 @@ import com.example.app_watch.R
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
 import androidx.compose.runtime.*
@@ -23,12 +24,14 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.wear.compose.material.Button
 import kotlinx.coroutines.launch
-import androidx.compose.runtime.getValue
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import com.example.app_watch.presentation.Models.Agenda
-import com.example.app_watch.presentation.Models.AgendaItem
+import com.example.app_watch.Singleton
+import com.example.app_watch.presentation.Models.AgendaAdmin
+import com.example.app_watch.presentation.Models.AgendaItemAdmin
+import com.example.app_watch.presentation.Models.AgendaTecnico
+import com.example.app_watch.presentation.Models.AgendaTecnicoItem
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -37,35 +40,61 @@ import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
 class OrderViewModel : ViewModel() {
-    private val _agendaList = mutableStateListOf<AgendaItem>()
-    val agendaList: List<AgendaItem> by derivedStateOf { _agendaList }
+    val agendaList = mutableStateListOf<AgendaItemAdmin>()
+    val agendaTecnicoList = mutableStateListOf<AgendaTecnicoItem>()
+    val today = LocalDate.now()
+    val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
+    val formattedDate = today.format(formatter)
+
     init {
         fetchOrdersData()
     }
 
     private fun fetchOrdersData() {
-        val today = LocalDate.now()
-        val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
-        val formattedDate = today.format(formatter)
         viewModelScope.launch {
-            val call = RetrofitClient.api.agenda("ordenes","")
-            call.enqueue(object : Callback<Agenda> {
-                override fun onResponse(call: Call<Agenda>, response: Response<Agenda>) {
-                    if (response.isSuccessful) {
-                        val agenda = response.body()
-                        _agendaList.clear()
-                        if (agenda != null) {
-                            _agendaList.addAll(agenda)
+            val callAgenda = RetrofitClient.api.agenda("ordenes","")
+            val callAgendaTecnico = RetrofitClient.api.agendaTecnico("ordenes","", Singleton.user_id.toString())
+            when(Singleton.rol){
+                1 -> {
+                    callAgenda.enqueue(object : Callback<AgendaAdmin> {
+                        override fun onResponse(call: Call<AgendaAdmin>, response: Response<AgendaAdmin>) {
+                            if (response.isSuccessful) {
+                                val agenda = response.body()
+                                agendaList.clear()
+                                if (agenda != null) {
+                                    agendaList.addAll(agenda)
+                                }
+                            } else {
+                                println("Error en la respuesta: ${response.code()}")
+                            }
                         }
-                    } else {
-                        println("Error en la respuesta: ${response.code()}")
-                    }
-                }
 
-                override fun onFailure(call: Call<Agenda>, t: Throwable) {
-                    println("Error en la solicitud: ${t.message}")
+                        override fun onFailure(call: Call<AgendaAdmin>, t: Throwable) {
+                            println("Error en la solicitud: ${t.message}")
+                        }
+                    })
                 }
-            })
+                else -> {
+                    callAgendaTecnico.enqueue(object : Callback<AgendaTecnico> {
+                        override fun onResponse(call: Call<AgendaTecnico>, response: Response<AgendaTecnico>) {
+                            if (response.isSuccessful) {
+                                val agenda = response.body()
+                                agendaTecnicoList.clear()
+                                if (agenda != null) {
+                                    agendaTecnicoList.addAll(agenda)
+                                }
+                            } else {
+                                println("Error en la respuesta: ${response.code()}")
+                            }
+                        }
+
+                        override fun onFailure(call: Call<AgendaTecnico>, t: Throwable) {
+                            println("Error en la solicitud: ${t.message}")
+                        }
+                    })
+                }
+            }
+
         }
     }
 }
@@ -74,6 +103,7 @@ class OrderViewModel : ViewModel() {
 fun OrdersScreen(navController: NavController,ordersViewModel: OrderViewModel = viewModel()) {
 
     val agendaList = remember { ordersViewModel.agendaList }
+    val agendaTecnicoList = remember {ordersViewModel.agendaTecnicoList}
 
     Column (
         modifier = Modifier
@@ -111,19 +141,41 @@ fun OrdersScreen(navController: NavController,ordersViewModel: OrderViewModel = 
         )
         Spacer(modifier = Modifier.height(5.dp))
 
-        LazyColumn {
-            items(agendaList) { solicitud ->
-                Column(modifier = Modifier
-                    .clickable {
-                        navController.navigate("details/${solicitud.id}")
+        when(Singleton.rol) {
+            1 -> {
+                LazyColumn {
+                    items(agendaList) { agenda ->
+                        Column(modifier = Modifier
+                            .clickable {
+                                navController.navigate("details/${agenda.id}")
+                            }
+                        ) {
+                            AgendaView(agenda = agenda)
+                            Divider(
+                                color = Color(0xFF4B4EA3),
+                                thickness = 1.dp,
+                                modifier = Modifier.padding(vertical = 4.dp)
+                            )
+                        }
                     }
-                ) {
-                    SolicitudView(solicitud = solicitud)
-                    Divider(
-                        color = Color(0xFF4B4EA3),
-                        thickness = 1.dp,
-                        modifier = Modifier.padding(vertical = 4.dp)
-                    )
+                }
+            }
+            else -> {
+                LazyColumn {
+                    items(agendaTecnicoList) { agenda ->
+                        Column(modifier = Modifier
+                            .clickable {
+                                navController.navigate("details/${agenda.id}")
+                            }
+                        ) {
+                            AgendaTecnicoView(agenda = agenda)
+                            Divider(
+                                color = Color(0xFF4B4EA3),
+                                thickness = 1.dp,
+                                modifier = Modifier.padding(vertical = 4.dp)
+                            )
+                        }
+                    }
                 }
             }
         }
@@ -131,11 +183,11 @@ fun OrdersScreen(navController: NavController,ordersViewModel: OrderViewModel = 
 }
 
 @Composable
-fun SolicitudView(solicitud: AgendaItem) {
+fun AgendaView(agenda: AgendaItemAdmin) {
     val originalFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
     val targetDateFormat = DateTimeFormatter.ofPattern("dd/MM/yyyy")
     val targetTimeFormat = DateTimeFormatter.ofPattern("HH:mm")
-    val originalDateTime = LocalDateTime.parse(solicitud.fechaHoraSolicitud, originalFormat)
+    val originalDateTime = LocalDateTime.parse(agenda.fechaHoraSolicitud, originalFormat)
 
     val formattedDate = originalDateTime.format(targetDateFormat)
     val formattedTime = originalDateTime.format(targetTimeFormat)
@@ -146,7 +198,7 @@ fun SolicitudView(solicitud: AgendaItem) {
             horizontalArrangement = Arrangement.Start
         ){
             Text(
-                text = "Folio: ${solicitud.id}",
+                text = "Folio: ${agenda.id}",
                 color = Color.Black,
                 fontSize = 11.sp
             )
@@ -160,6 +212,40 @@ fun SolicitudView(solicitud: AgendaItem) {
             )
         }
         Text(text = "Hora: ${formattedTime}", color = Color.Black)
-        Text(text = "Estatus: ${solicitud.estatus}", color = Color.Black)
+        Text(text = "Estatus: ${agenda.estatus}", color = Color.Black)
+    }
+}
+
+@Composable
+fun AgendaTecnicoView(agenda: AgendaTecnicoItem) {
+    val originalFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
+    val targetDateFormat = DateTimeFormatter.ofPattern("dd/MM/yyyy")
+    val targetTimeFormat = DateTimeFormatter.ofPattern("HH:mm")
+    val originalDateTime = LocalDateTime.parse(agenda.fechaHoraSolicitud, originalFormat)
+
+    val formattedDate = originalDateTime.format(targetDateFormat)
+    val formattedTime = originalDateTime.format(targetTimeFormat)
+    Column(modifier = Modifier.padding(16.dp)) {
+        Row (
+            modifier = Modifier
+                .fillMaxWidth(),
+            horizontalArrangement = Arrangement.Start
+        ){
+            Text(
+                text = "Folio: ${agenda.id}",
+                color = Color.Black,
+                fontSize = 11.sp
+            )
+
+            Spacer(modifier = Modifier.padding(horizontal = 6.dp))
+
+            Text(
+                text = "Fecha: ${formattedDate}",
+                color = Color.Black,
+                fontSize = 11.sp
+            )
+        }
+        Text(text = "Hora: ${formattedTime}", color = Color.Black)
+        Text(text = "Estatus: ${agenda.estatus}", color = Color.Black)
     }
 }
