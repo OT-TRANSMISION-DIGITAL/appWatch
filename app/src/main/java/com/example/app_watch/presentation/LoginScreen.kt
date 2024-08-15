@@ -170,6 +170,7 @@ fun validateCodigo(codigo: String, callback: (Boolean) -> Unit) {
                 Singleton.rol = apiResponse?.usuario?.rol_id ?: 0
                 Singleton.user_id = apiResponse?.usuario?.id ?: 0
                 Singleton.name = apiResponse?.usuario?.nombre ?: ""
+                println("usuario - ${apiResponse}")
                 callback(true)
             } else {
                 println("Error: ${response.errorBody()}")

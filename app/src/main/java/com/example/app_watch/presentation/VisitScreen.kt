@@ -127,12 +127,27 @@ fun visitScreen(navController: NavController, id: String){
             modifier = Modifier.padding(vertical = 4.dp)
         )
         LazyColumn {
-            items(details) { details ->
-                val originalDateTime = LocalDateTime.parse(details.fechaHoraSolicitud, originalFormat)
-                val originalDateTimeatencion = LocalDateTime.parse(details.fechaHoraLlegada, originalFormat)
-                val formattedDate = originalDateTime.format(targetDateFormat)
-                val formattedTime = originalDateTime.format(targetTimeFormat)
-                val formattedTimeAtencion = originalDateTimeatencion.format(targetTimeFormat)
+            items(details) { detail ->
+                val originalDateTime = try {
+                    detail.fechaHoraSolicitud?.let {
+                        LocalDateTime.parse(it, originalFormat)
+                    }
+                } catch (e: Exception) {
+                    null
+                }
+
+                val originalDateTimeAtencion = try {
+                    detail.fechaHoraLlegada?.let {
+                        LocalDateTime.parse(it, originalFormat)
+                    }
+                } catch (e: Exception) {
+                    null
+                }
+
+                val formattedDate = originalDateTime?.format(targetDateFormat) ?: "Fecha no disponible"
+                val formattedTime = originalDateTime?.format(targetTimeFormat) ?: "Hora no disponible"
+                val formattedTimeAtencion = originalDateTimeAtencion?.format(targetTimeFormat) ?: "Hora atención no disponible"
+
                 Column(modifier = Modifier.padding(16.dp), horizontalAlignment = Alignment.Start) {
                     Column(
                         modifier = Modifier
@@ -141,18 +156,19 @@ fun visitScreen(navController: NavController, id: String){
                         horizontalAlignment = Alignment.CenterHorizontally,
                         verticalArrangement = Arrangement.Center
                     ) {
-                        Text(text = "Folio: ${details.id}", color = Color.Black,fontWeight = FontWeight.Bold)
+                        Text(text = "Folio: ${detail.id}", color = Color.Black, fontWeight = FontWeight.Bold)
                     }
-                    Text(text = "Fecha: ${formattedDate}", color = Color.Black, fontSize = 11.sp )
-                    Text(text = "Hora: ${formattedTime}", color = Color.Black, fontSize = 11.sp  )
-                    Text(text = "Motivo: ${details.motivo}", color = Color.Black, fontSize = 11.sp  )
-                    Text(text = "Dirección: ${details.direccion}", color = Color.Black, fontSize = 11.sp  )
-                    Text(text = "Cliente: ${details.cliente.nombre}", color = Color.Black, fontSize = 11.sp  )
-                    Text(text = "Tecnico: ${details.tecnico.nombre}", color = Color.Black, fontSize = 11.sp  )
-                    Text(text = "Estado: ${details.estatus}", color = Color.Black, fontSize = 11.sp  )
-                    Text(text = "Hora atención: ${formattedTimeAtencion}", color = Color.Black, fontSize = 11.sp  )
+                    Text(text = "Fecha: $formattedDate", color = Color.Black, fontSize = 11.sp)
+                    Text(text = "Hora: $formattedTime", color = Color.Black, fontSize = 11.sp)
+                    Text(text = "Motivo: ${detail.motivo}", color = Color.Black, fontSize = 11.sp)
+                    Text(text = "Dirección: ${detail.direccion}", color = Color.Black, fontSize = 11.sp)
+                    Text(text = "Cliente: ${detail.cliente.nombre}", color = Color.Black, fontSize = 11.sp)
+                    Text(text = "Técnico: ${detail.tecnico.nombre}", color = Color.Black, fontSize = 11.sp)
+                    Text(text = "Estado: ${detail.estatus}", color = Color.Black, fontSize = 11.sp)
+                    Text(text = "Hora atención: $formattedTimeAtencion", color = Color.Black, fontSize = 11.sp)
                 }
             }
         }
+
     }
 }

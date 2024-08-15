@@ -51,14 +51,15 @@ class visitsViewModel : ViewModel() {
 
     private fun fetchOrdersData() {
         viewModelScope.launch {
-            val callAgenda = RetrofitClient.api.agenda("visitas","")
-            val callAgendaTecnico = RetrofitClient.api.agendaTecnico("visitas","", Singleton.user_id.toString())
+            println("rol del usuario - ${Singleton.rol}")
             when(Singleton.rol){
                 1 -> {
+                    val callAgenda = RetrofitClient.api.agenda("visitas","")
                     callAgenda.enqueue(object : Callback<AgendaAdmin> {
                         override fun onResponse(call: Call<AgendaAdmin>, response: Response<AgendaAdmin>) {
                             if (response.isSuccessful) {
                                 val agenda = response.body()
+                                println(response.body())
                                 agendaList.clear()
                                 if (agenda != null) {
                                     agendaList.addAll(agenda)
@@ -74,11 +75,13 @@ class visitsViewModel : ViewModel() {
                     })
                 }
                 else -> {
+                    val callAgendaTecnico = RetrofitClient.api.agendaTecnico("visitas","${Singleton.user_id}")
                     callAgendaTecnico.enqueue(object : Callback<AgendaTecnico> {
                         override fun onResponse(call: Call<AgendaTecnico>, response: Response<AgendaTecnico>) {
                             if (response.isSuccessful) {
                                 val agenda = response.body()
                                 agendaTecnicoList.clear()
+                                println(response.body())
                                 if (agenda != null) {
                                     agendaTecnicoList.addAll(agenda)
                                 }
@@ -146,7 +149,11 @@ fun VisitsScreen(navController: NavController,VisitsViewModel: visitsViewModel =
                     items(agendaList) { agenda ->
                         Column (modifier = Modifier
                             .clickable {
-                                navController.navigate("visitDetails/${agenda.id}")
+                                agenda.id?.let {
+                                    navController.navigate("visitDetails/$it")
+                                } ?: run {
+                                    println("ID es nulo")
+                                }
                             }
                         ){
                             visitsView(agenda = agenda)

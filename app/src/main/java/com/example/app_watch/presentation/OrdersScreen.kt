@@ -51,11 +51,11 @@ class OrderViewModel : ViewModel() {
     }
 
     private fun fetchOrdersData() {
+        println(Singleton.user_id)
         viewModelScope.launch {
-            val callAgenda = RetrofitClient.api.agenda("ordenes","")
-            val callAgendaTecnico = RetrofitClient.api.agendaTecnico("ordenes","", Singleton.user_id.toString())
             when(Singleton.rol){
                 1 -> {
+                    val callAgenda = RetrofitClient.api.agenda("ordenes","")
                     callAgenda.enqueue(object : Callback<AgendaAdmin> {
                         override fun onResponse(call: Call<AgendaAdmin>, response: Response<AgendaAdmin>) {
                             if (response.isSuccessful) {
@@ -75,6 +75,7 @@ class OrderViewModel : ViewModel() {
                     })
                 }
                 else -> {
+                    val callAgendaTecnico = RetrofitClient.api.agendaTecnico("ordenes","${Singleton.user_id}")
                     callAgendaTecnico.enqueue(object : Callback<AgendaTecnico> {
                         override fun onResponse(call: Call<AgendaTecnico>, response: Response<AgendaTecnico>) {
                             if (response.isSuccessful) {
