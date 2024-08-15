@@ -23,7 +23,10 @@ interface ApiService {
     fun agenda(@Query("tipo") tipo: String?,@Query("fecha") fecha: String?): Call<AgendaAdmin>
 
     @GET("agenda")
-    fun agendaTecnico(@Query("tipo") tipo: String?, @Query("fecha") fecha: String?, @Query("tecnico") tecnico: String): Call<AgendaTecnico>
+    fun agendaTecnico(
+        @Query("tipo") tipo: String?,
+        @Query("tecnico") tecnico: String?
+    ): Call<AgendaTecnico>
 
     @GET("ordenes/{id}")
     fun ordenDetail(@Path("id") id: String): Call<ordenDetail>

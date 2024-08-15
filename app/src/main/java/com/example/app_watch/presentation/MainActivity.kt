@@ -26,35 +26,40 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.example.app_watch.presentation.theme.App_watchTheme
 import androidx.compose.ui.graphics.Color
 import androidx.core.content.ContextCompat
+import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.app_watch.Singleton
 
 class MainActivity : ComponentActivity() {
+
+    private lateinit var navController: NavController
+
     override fun onCreate(savedInstanceState: Bundle?) {
         installSplashScreen()
-
         super.onCreate(savedInstanceState)
 
         setTheme(android.R.style.Theme_DeviceDefault)
-
         loadData(this)
 
         Intent(this, PusherService::class.java).also { intent ->
             ContextCompat.startForegroundService(this, intent)
         }
 
-
         setContent {
-            WearApp()
+            val lastScreen = loadLastScreen(this)
+            WearApp(startDestination = lastScreen ?: "login")
         }
     }
+
 
     override fun onPause() {
         super.onPause()
         saveData(this)
+        saveLastScreen(navController.currentDestination?.route, this)
     }
+
 
 }
 
@@ -81,12 +86,25 @@ fun loadData(context: Context) {
     Singleton.name = sharedPreferences.getString("name", "") ?: ""
 }
 
+fun saveLastScreen(screen: String?, context: Context) {
+    val sharedPreferences = context.getSharedPreferences("MyAppPrefs", Context.MODE_PRIVATE)
+    val editor = sharedPreferences.edit()
+    editor.putString("last_screen", screen)
+    editor.apply()
+}
+
+fun loadLastScreen(context: Context): String? {
+    val sharedPreferences = context.getSharedPreferences("MyAppPrefs", Context.MODE_PRIVATE)
+    return sharedPreferences.getString("last_screen", null)
+}
+
+
 
 
 
 
 @Composable
-fun WearApp() {
+fun WearApp(startDestination: String) {
     val navController = rememberNavController()
     App_watchTheme {
         Box(
@@ -95,7 +113,7 @@ fun WearApp() {
                 .background(Color.White),
             contentAlignment = Alignment.Center
         ) {
-            NavHost(navController = navController, startDestination = "login") {
+            NavHost(navController = navController, startDestination = startDestination) {
                 composable("login") { LoginScreen(navController) }
                 composable("home") { HomeScreen(navController) }
                 composable("schedule") { scheduleScreen(navController)}
@@ -112,8 +130,9 @@ fun WearApp() {
     }
 }
 
+
 @Preview(device = Devices.WEAR_OS_SMALL_ROUND, showSystemUi = true)
 @Composable
 fun DefaultPreview() {
-    WearApp()
+    WearApp(startDestination = "login")
 }
